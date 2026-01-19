@@ -29,7 +29,7 @@ dropdown_ = dcc.Dropdown(
         {"label": "Life Expectancy", "value": "lifeExp"},
     ],
 )
-graph_ = dcc.Graph(id="figure1", style={"height": "600px"})
+graph_ = dcc.Graph(id="figure1", style={'height': '70vh'})
 
 # App Layout
 app.layout = dbc.Container(

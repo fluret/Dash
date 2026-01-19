@@ -31,7 +31,7 @@ app.layout = dbc.Container(
     Output(component_id='our-markdown', component_property='children'),
     Input(component_id='our-dropdown', component_property='value')
 )
-def update_markdown(value_dropdown):
+def update_title(value_dropdown):
     title = value_dropdown
     return title
 
@@ -40,7 +40,7 @@ def update_markdown(value_dropdown):
     Input(component_id='our-slider', component_property='value'),
     Input(component_id='our-radio', component_property='value')
 )
-def update_markdown(value_slider, value_radio):
+def update_style(value_slider, value_radio):
     new_style = {'fontSize': 12+2*value_slider, 'color' : value_radio}
     return new_style
 
