@@ -1,12 +1,13 @@
-"""Consolidated Dash app - Q2v3: Optimized single file version."""
 
+import dash
 from datetime import date
 from functools import lru_cache
 import pandas as pd
 import plotly.express as px
-from dash import Dash, Input, Output, callback, dcc, html, get_app
+from dash import Input, Output, callback, dcc, html
 import dash_bootstrap_components as dbc
 
+dash.register_page(__name__, path="/page2")
 
 # Constants
 THEME = dbc.themes.LITERA
@@ -125,42 +126,39 @@ def create_layout() -> dbc.Container:
 # APP
 # ============================================================================
 
-def create_app() -> Dash:
-    """Create Dash app."""
-    app = Dash(__name__, external_stylesheets=[THEME], suppress_callback_exceptions=True)
-    app.layout = create_layout()
-    
-    # Pre-build components for callbacks
-    app.date_card = dbc.Card([
-        dbc.CardHeader(html.Div([html.I(className="bi bi-calendar me-2"), "Plage de dates"]),
-                      className="fw-semibold text-white", style={"background": GRADIENT}),
-        dbc.CardBody([
-            dcc.DatePickerRange(
-                id="date-range-solution2", min_date_allowed=MIN_TS, max_date_allowed=MAX_TS,
-                start_date=DEFAULT_START, end_date=DEFAULT_END,
-                display_format="DD-MMM-YYYY", first_day_of_week=1,
-            ),
-            html.Div([
-                dbc.Badge(f"Min: {MIN_DATE.strftime('%d-%b-%Y')}", color="secondary", className="me-2 mt-3"),
-                dbc.Badge(f"Max: {MAX_DATE.strftime('%d-%b-%Y')}", color="secondary", className="mt-3"),
-            ], className="d-flex gap-2 justify-content-center"),
-        ], className="bg-light"),
-    ], className=f"{STYLE['card']} mb-3")
-    
-    app.cards = [card("my-graph-left-solution2", "Before Range"),
-                 card("my-graph-center-solution2", "Selected Range"),
-                 card("my-graph-right-solution2", "After Range")]
-    
-    app.metric_select = dbc.InputGroup([
-        dbc.InputGroupText("Metric"),
-        dbc.Select(id="metric-dropdown-solution2", options=METRIC_OPTIONS, value="gdpPercap"),
-    ], className="mb-3")
-    
-    app.gapminder_card = dbc.Card(dbc.CardBody(
-        dcc.Graph(id="figure1-solution2", style={"height": CHART["height_gap"]})
-    ), className=STYLE["card"])
-    
-    return app
+
+# Composants globaux pour multipage
+date_card = dbc.Card([
+    dbc.CardHeader(html.Div([html.I(className="bi bi-calendar me-2"), "Plage de dates"]),
+                  className="fw-semibold text-white", style={"background": GRADIENT}),
+    dbc.CardBody([
+        dcc.DatePickerRange(
+            id="date-range-solution2", min_date_allowed=MIN_TS, max_date_allowed=MAX_TS,
+            start_date=str(DEFAULT_START), end_date=str(DEFAULT_END),
+            display_format="DD-MMM-YYYY", first_day_of_week=1,
+        ),
+        html.Div([
+            dbc.Badge(f"Min: {MIN_DATE.strftime('%d-%b-%Y')}", color="secondary", className="me-2 mt-3"),
+            dbc.Badge(f"Max: {MAX_DATE.strftime('%d-%b-%Y')}", color="secondary", className="mt-3"),
+        ], className="d-flex gap-2 justify-content-center"),
+    ], className="bg-light"),
+], className=f"{STYLE['card']} mb-3")
+
+cards = [card("my-graph-left-solution2", "Before Range"),
+         card("my-graph-center-solution2", "Selected Range"),
+         card("my-graph-right-solution2", "After Range")]
+
+metric_select = dbc.InputGroup([
+    dbc.InputGroupText("Metric"),
+    dbc.Select(id="metric-dropdown-solution2", options=METRIC_OPTIONS, value="gdpPercap"),
+], className="mb-3")
+
+gapminder_card = dbc.Card(dbc.CardBody(
+    dcc.Graph(id="figure1-solution2", style={"height": CHART["height_gap"]})
+), className=STYLE["card"])
+
+# Layout multipage
+layout = create_layout()
 
 
 
@@ -206,27 +204,19 @@ def update_gap(metric):
 )
 def render_tab(tab):
     """Render tab content."""
-    app = get_app()
     if tab == "tab-app-1":
         return dbc.Container([
-            dbc.Row(dbc.Col(app.date_card, width=12)),
-            dbc.Row([dbc.Col(c, md=4) for c in app.cards], className="g-3"),
+            dbc.Row(dbc.Col(date_card, width=12)),
+            dbc.Row([dbc.Col(c, md=4) for c in cards], className="g-3"),
         ], fluid=True)
     
     if tab == "tab-app-2":
         return dbc.Container([
-            dbc.Row(dbc.Col(app.metric_select, md=3)),
-            dbc.Row(dbc.Col(app.gapminder_card, width=12)),
+            dbc.Row(dbc.Col(metric_select, md=3)),
+            dbc.Row(dbc.Col(gapminder_card, width=12)),
         ], fluid=True)
     
     return html.Div()
 
 
 
-# ============================================================================
-# MAIN
-# ============================================================================
-
-if __name__ == "__main__":
-    app = create_app()
-    app.run(debug=True, port=8051)

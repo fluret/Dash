@@ -1,13 +1,7 @@
-"""Graph card components with styled headers."""
+"""Graph card components."""
 from dash import dcc, html
 import dash_bootstrap_components as dbc
-from config import (
-    CHART_HEIGHT,
-    GAPMINDER_CHART_HEIGHT,
-    GRADIENT_BG,
-    CARD_HEADER_CLASS,
-    CARD_CLASS,
-)
+from config import CHART_HEIGHT, GAPMINDER_CHART_HEIGHT
 
 
 def create_graph_card(graph_id: str, title: str = "") -> dbc.Card:
@@ -20,15 +14,8 @@ def create_graph_card(graph_id: str, title: str = "") -> dbc.Card:
         )
     ]
     if title:
-        card_content.insert(
-            0,
-            dbc.CardHeader(
-                title,
-                className=CARD_HEADER_CLASS,
-                style={"background": GRADIENT_BG},
-            ),
-        )
-    return dbc.Card(card_content, className=f"{CARD_CLASS} h-100")
+        card_content.insert(0, dbc.CardHeader(title, className="fw-bold"))
+    return dbc.Card(card_content, className="shadow-sm h-100")
 
 
 def create_gapminder_card(graph_id: str) -> dbc.Card:
@@ -36,5 +23,5 @@ def create_gapminder_card(graph_id: str) -> dbc.Card:
         dbc.CardBody(
             dcc.Graph(id=graph_id, style={"height": GAPMINDER_CHART_HEIGHT})
         ),
-        className=CARD_CLASS,
+        className="shadow-sm",
     )

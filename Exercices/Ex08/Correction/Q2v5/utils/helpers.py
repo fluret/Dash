@@ -12,10 +12,12 @@ def make_stocks_fig(df_slice: pd.DataFrame):
 
 
 def fmt_date(ts: pd.Timestamp) -> str:
+    """Format timestamp as DD-MMM-YYYY."""
     return ts.date().strftime("%d-%b-%Y")
 
 
 def make_badges(start_dt, end_dt):
+    """Create start/end date badges."""
     return [
         dbc.Badge(f"Start: {fmt_date(start_dt)}", color=BADGE_COLOR),
         dbc.Badge(f"End: {fmt_date(end_dt)}", color=BADGE_COLOR),
@@ -23,6 +25,16 @@ def make_badges(start_dt, end_dt):
 
 
 def normalize_range(start_date, end_date):
+    """
+    Normalize date range, handling None values and swapping if reversed.
+    
+    Args:
+        start_date: Start date string or None
+        end_date: End date string or None
+        
+    Returns:
+        Tuple of (start_dt, end_dt) as Pandas Timestamps
+    """
     start_dt = pd.to_datetime(start_date) if start_date else MIN_TS
     end_dt = pd.to_datetime(end_date) if end_date else MAX_TS
     if start_dt > end_dt:
