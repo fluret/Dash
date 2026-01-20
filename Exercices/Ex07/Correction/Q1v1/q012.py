@@ -12,7 +12,7 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 # Create app components
 markdown = dcc.Markdown(
-    id="our-markdown", children="# Exercise 10.1", style={"textAlign": "center"}
+    id="our-markdown", children="# Exercise 7.1", style={"textAlign": "center"}
 )
 button = html.Button(id="draw", children="Plot Graph", n_clicks=0)
 data_table = dash_table.DataTable(

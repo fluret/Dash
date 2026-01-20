@@ -54,6 +54,29 @@ def display_navigation_menu(current_path: Path, dirs, files):
     print("=" * 50)
 
 
+def detect_port_from_output(process, timeout=5):
+    """Détecte le port en lisant la sortie du processus."""
+    import socket
+    import select
+    
+    # Ports par défaut à tester
+    default_ports = [8050, 8051, 8052, 8053]
+    
+    # Cherche un port disponible dans la sortie
+    start_time = time.time()
+    while time.time() - start_time < timeout:
+        # Teste si un des ports par défaut est utilisé
+        for port in default_ports:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            result = sock.connect_ex(('127.0.0.1', port))
+            sock.close()
+            if result == 0:  # Port ouvert
+                return port
+        time.sleep(0.5)
+    
+    return 8050  # Retourne le port par défaut si aucun n'est détecté
+
+
 def run_app(file_path):
     """Lance l'application Python spécifiée."""
     print(f"\n🚀 Lancement de {file_path.name}...\n")
@@ -65,16 +88,17 @@ def run_app(file_path):
             cwd=str(file_path.parent)
         )
         
-        # Attend que le serveur démarre
+        # Attend que le serveur démarre et détecte le port
         print("⏳ Démarrage du serveur...")
         time.sleep(3)
+        port = detect_port_from_output(process)
         
         # Ouvre le navigateur avec la commande Windows
-        print("🌐 Ouverture du navigateur...")
+        print(f"🌐 Ouverture du navigateur sur le port {port}...")
         if os.name == 'nt':  # Windows
-            os.system('start http://127.0.0.1:8050/')
+            os.system(f'start http://127.0.0.1:{port}/')
         else:
-            webbrowser.open('http://127.0.0.1:8050/')
+            webbrowser.open(f'http://127.0.0.1:{port}/')
         
         # Attend que le processus se termine
         process.wait()
