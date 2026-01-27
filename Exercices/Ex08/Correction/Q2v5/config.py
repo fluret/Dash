@@ -1,6 +1,20 @@
-"""Configuration and styling constants for Q2v4 app."""
+
+"""
+Constantes de configuration et de style pour l'application Q2v5.
+Centralise les couleurs, thèmes, options et styles réutilisables.
+"""
+
 from datetime import date
 import dash_bootstrap_components as dbc
+
+# Style flex pour la ligne de contrôle (badges + datepicker)
+CONTROL_FLEX_ROW_STYLE = {
+    "display": "flex",
+    "flexDirection": "row",
+    "alignItems": "center",
+    "justifyContent": "space-between",
+    "gap": "12px"
+}
 
 # Theme
 THEME = dbc.themes.LITERA
@@ -27,15 +41,24 @@ CONTAINER_STYLE = {
     "padding": "20px",
 }
 
-# Header styling
-HEADER_STYLE = {
-    "background": GRADIENT_BG,
+
+
+# Style flex pour le CardBody du header (sans background)
+HEADER_CARDBODY_STYLE = {
+    "display": "flex",
+    "flexDirection": "row",
+    "alignItems": "center",
+    "justifyContent": "space-between",
     "color": "white",
-    "padding": "32px 20px",
+    "padding": "12px 20px",
+    "borderRadius": "12px"
+}
+
+# Style pour le Card du header (background gradient)
+HEADER_CARD_STYLE = {
+    "background": GRADIENT_BG,
     "borderRadius": "12px",
-    "marginBottom": "28px",
-    "textAlign": "center",
-    "boxShadow": "0 4px 15px rgba(0,0,0,0.1)",
+    "marginBottom": "28px"
 }
 
 # Defaults

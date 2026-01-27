@@ -1,4 +1,8 @@
-"""Tabs component with modern pills style."""
+
+"""
+Composant d'onglets avec style moderne (pills) pour Q2v5.
+"""
+
 import dash_bootstrap_components as dbc
 from dash import html
 

@@ -1,4 +1,8 @@
-"""Chart callbacks for both tabs."""
+
+"""
+Callbacks pour les graphiques des deux onglets dans Q2v5.
+"""
+
 from dash import Input, Output, callback
 import plotly.express as px
 from data import stocks_df, gapminder_df, MIN_TS, MAX_TS

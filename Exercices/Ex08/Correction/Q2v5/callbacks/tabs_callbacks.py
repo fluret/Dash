@@ -1,4 +1,8 @@
-"""Tab rendering callbacks."""
+
+"""
+Callbacks pour le rendu dynamique des onglets dans Q2v5.
+"""
+
 from dash import Input, Output, callback, html, get_app
 import dash_bootstrap_components as dbc
 

@@ -1,3 +1,7 @@
+# Codes unicode utilisés dans les titres et boutons
+ICON_SALES = "\U0001F4CA"  # 📊
+ICON_TABLE = "\U0001F4CB"  # 📋
+ICON_CHART = "\U0001F4C8"  # 📈
 # Import packages
 from dash import Dash, dash_table, dcc, html, Input, Output, State
 import dash_bootstrap_components as dbc
@@ -48,7 +52,7 @@ app = Dash(__name__, external_stylesheets=[DEFAULT_THEME])
 # Create app components
 title = html.Div(
     [
-        html.H1("📊 Sales Analytics Dashboard", className="mb-0"),
+        html.H1(f"{ICON_SALES} Sales Analytics Dashboard", className="mb-0"),
         html.P("Interactive data visualization and analysis", className="text-light mt-2 mb-0")
     ],
     style=HEADER_STYLE
@@ -94,12 +98,12 @@ button = dbc.Button(
 
 
 def create_card(title_text, icon, content, width_lg):
-    """Create a card with standardized styling and icons."""
+    """Create a card with standardized styling and unicode icons."""
     return dbc.Col(
         dbc.Card(
             [
                 dbc.CardHeader(
-                    html.H5([icon, " ", title_text], className="mb-0"),
+                    html.H5(f"{icon} {title_text}", className="mb-0"),
                     style={"backgroundColor": CARD_HEADER_COLOR, "color": "white", "fontWeight": "600"}
                 ),
                 dbc.CardBody(
@@ -121,8 +125,8 @@ app.layout = dbc.Container(
         title,
         dbc.Row(
             [
-                create_card("📋 Input Data", html.I(className="bi bi-table"), data_table, 5),
-                create_card("📈 Chart Visualization", html.I(className="bi bi-graph-up"), graph, 7)
+                create_card("Input Data", ICON_TABLE, data_table, 5),
+                create_card("Chart Visualization", ICON_CHART, graph, 7)
             ],
             className="g-4 mb-4"
         ),
@@ -146,29 +150,20 @@ def plot_table(n_clicks, table_data):
     """Update chart based on table data."""
     dff = pd.DataFrame(table_data)
     
-    fig = px.bar(
-        dff, 
-        x="time", 
-        y="total_bill", 
+    fig = px.scatter(
+        dff,
+        x="total_bill",
+        y="tip",
         color="day",
-        title="Total Bill by Time and Day",
-        labels={"total_bill": "Total Bill ($)", "time": "Time of Day"},
-        color_discrete_sequence=COLOR_PALETTE
+        size="size",
+        hover_data=["sex", "smoker", "time"]
     )
     
     fig.update_layout(
         template="plotly_white",
         hovermode="x unified",
-        plot_bgcolor="rgba(0,0,0,0)",
-        paper_bgcolor="rgba(0,0,0,0)",
         font={"family": "Arial, sans-serif", "size": 12},
-        title_font_size=16,
-        margin=dict(l=50, r=50, t=50, b=50),
-        height=500
     )
-    
-    fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor="rgba(200,200,200,0.1)")
-    fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor="rgba(200,200,200,0.1)")
     
     return fig
 

@@ -14,44 +14,49 @@ df = (
 app = Dash(__name__, external_stylesheets=[dbc.themes.COSMO])
 
 # Layout
+
+# Styles communs
+HEADER_CLASS = 'text-center text-white text-uppercase bg-primary py-3 mb-4'
+CARD_CLASS = 'shadow-sm rounded-3 h-100'
+TABLE_STYLE = {
+    'table': {'maxHeight': '70vh', 'overflowY': 'auto'},
+    'cell': {'textAlign': 'center'},
+    'header': {'backgroundColor': '#2c3e50', 'color': 'white', 'fontWeight': 'bold'},
+    'data_conditional': [{'if': {'row_index': 'odd'}, 'backgroundColor': '#f8f9fa'}]
+}
+
+# Composants principaux
+header = html.H1("Gapminder Table App", className=HEADER_CLASS)
+
+datatable = dash_table.DataTable(
+    id="dataTable1",
+    data=df.to_dict("records"),
+    columns=[
+        {"name": c, "id": c, "selectable": c not in ["country", "year"]}
+        for c in df.columns
+    ],
+    page_size=25,
+    column_selectable="single",
+    filter_action="native",
+    style_table=TABLE_STYLE['table'],
+    style_cell=TABLE_STYLE['cell'],
+    style_header=TABLE_STYLE['header'],
+    style_data_conditional=TABLE_STYLE['data_conditional']
+)
+
+table_card = dbc.Card(dbc.CardBody(datatable), className=CARD_CLASS)
+
+graph = dcc.Graph(id="line-chart-1", style={'height': '70vh'})
+graph_card = dbc.Card(dbc.CardBody(graph), className=CARD_CLASS)
+
+main_row = dbc.Row([
+    dbc.Col([table_card], md=6),
+    dbc.Col([graph_card], md=6),
+])
+
 app.layout = dbc.Container([
-    html.H1(
-        "Gapminder Table App",
-        className='text-center text-white text-uppercase bg-primary py-3 mb-4'
-    ),
-    dbc.Row([
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    dash_table.DataTable(
-                        id="dataTable1",
-                        data=df.to_dict("records"),
-                        columns=[{"name": c, "id": c, "selectable": True} for c in df.columns],
-                        page_size=25,
-                        column_selectable="single",
-                        filter_action="native",
-                        style_table={'maxHeight': '70vh', 'overflowY': 'auto'},
-                        style_cell={'textAlign': 'center'},
-                        style_header={
-                            'backgroundColor': '#2c3e50',
-                            'color': 'white',
-                            'fontWeight': 'bold'
-                        },
-                        style_data_conditional=[
-                            {'if': {'row_index': 'odd'}, 'backgroundColor': '#f8f9fa'}
-                        ]
-                    )
-                ])
-            ], className='shadow-sm rounded-3 h-100')
-        ], md=6),
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    dcc.Graph(id="line-chart-1", style={'height': '70vh'})
-                ])
-            ], className='shadow-sm rounded-3 h-100')
-        ], md=6),
-    ])
+    header,
+    main_row
 ], fluid=True, className='p-3')
 
 

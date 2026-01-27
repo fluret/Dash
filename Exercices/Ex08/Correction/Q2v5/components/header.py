@@ -1,13 +1,17 @@
-"""Header component with gradient styling."""
+
+"""
+Composant d'en-tête avec style dégradé pour Q2v5.
+"""
+
+import dash_bootstrap_components as dbc
 from dash import html
-from config import HEADER_STYLE
+from config import HEADER_CARDBODY_STYLE, HEADER_CARD_STYLE
 
 
 def create_header():
-    return html.Div(
-        [
-            html.H2("📊 Exercice 8.2", className="mb-1 fw-bold"),
-            html.P("Deux onglets : séries financières et indicateurs globaux", className="mb-0"),
-        ],
-        style=HEADER_STYLE,
-    )
+    return dbc.Card([
+        dbc.CardBody([
+            html.H5("📊 Exercice 8.2", className="mb-0 fw-bold", style={"margin": 0}),
+            html.P("Deux onglets : séries financières et indicateurs globaux", className="mb-0", style={"margin": 0}),
+        ], style=HEADER_CARDBODY_STYLE)
+    ], style=HEADER_CARD_STYLE)

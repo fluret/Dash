@@ -1,4 +1,7 @@
-"""Main entry point for Q2v4 modular Dash app."""
+"""
+Point d'entrée principal pour l'application Dash Q2v5.
+Lance l'application et importe les callbacks pour l'enregistrement.
+"""
 from app import create_app
 from callbacks import tabs_callbacks, chart_callbacks  # noqa: F401
 

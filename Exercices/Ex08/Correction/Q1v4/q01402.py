@@ -62,7 +62,7 @@ def build_controls() -> dbc.Card:
                 ]
             ),
         ],
-        className="shadow-sm mb-3",
+        className="shadow-sm mb-4",
     )
 
 
@@ -75,7 +75,6 @@ def build_graph_card(title: str, graph_id: str) -> dbc.Card:
                 [
                     dcc.Graph(
                         id=graph_id,
-                        className="m-0",
                         style={"height": CHART_HEIGHT},
                         config={"responsive": True},
                     ),
@@ -121,9 +120,9 @@ app.layout = dbc.Container(
         build_controls(),
         dbc.Row(
             [
-                dbc.Col(build_graph_card("Avant la date de début", "my-graph-left"), md=4, xs=12, className="mb-3"),
-                dbc.Col(build_graph_card("Dans la plage", "my-graph-center"), md=4, xs=12, className="mb-3"),
-                dbc.Col(build_graph_card("Après la date de fin", "my-graph-right"), md=4, xs=12, className="mb-3"),
+                dbc.Col(build_graph_card("Avant la date de début", "my-graph-left"), md=4, xs=12),
+                dbc.Col(build_graph_card("Dans la plage", "my-graph-center"), md=4, xs=12),
+                dbc.Col(build_graph_card("Après la date de fin", "my-graph-right"), md=4, xs=12),
             ],
             className="g-3",
         ),

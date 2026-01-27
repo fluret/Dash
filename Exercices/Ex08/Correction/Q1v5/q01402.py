@@ -1,3 +1,5 @@
+# Icônes unicode
+ICON_CHART = "\U0001F4CA"  # 📊
 # Import packages
 from dash import Dash, dcc, Input, Output, html
 import dash_bootstrap_components as dbc
@@ -39,16 +41,39 @@ HEADER_STYLE = {
 app = Dash(__name__, external_stylesheets=[THEME])
 
 
+
+# Utilitaire pour le style du header
+def get_header_style():
+    return {
+        "padding": "18px 20px",
+        "display": "flex",
+        "flexDirection": "row",
+        "alignItems": "center",
+        "justifyContent": "space-between",
+        "background": f"linear-gradient(135deg, {CARD_HEADER_COLOR} 0%, {CARD_ACCENT_COLOR} 100%)",
+        "borderRadius": "12px"
+    }
+
 def build_header() -> dbc.Row:
-    """Gradient header inspired by Q1v4 styling."""
+    """Header compact et lisible, sans redondance."""
     return dbc.Row(
         dbc.Col(
-            html.Div(
+            dbc.Card(
                 [
-                    html.H2("📊 Exercice 8.1", className="mb-1 fw-bold"),
-                    html.P("Analyse temporelle des cours (GOOG, AAPL)", className="mb-0"),
+                    dbc.CardBody(
+                        [
+                            html.H5(f"{ICON_CHART} Exercice 8.1", className="text-white fs-6"),
+                            html.P("Analyse temporelle des cours (GOOG, AAPL)", className="text-white fs-6"),
+                        ],
+                        style=get_header_style()
+                    ),
                 ],
-                style=HEADER_STYLE,
+                className=CARD_CLASS,
+                style={
+                    "marginBottom": "8px",
+                    "borderRadius": "12px",
+                    "boxShadow": "0 4px 15px rgba(0,0,0,0.1)"
+                }
             ),
             width=12,
         )

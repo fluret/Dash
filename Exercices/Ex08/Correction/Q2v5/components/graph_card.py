@@ -1,4 +1,8 @@
-"""Graph card components with styled headers."""
+
+"""
+Composants de cartes graphiques avec en-têtes stylisés pour Q2v5.
+"""
+
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 from config import (

@@ -5,7 +5,7 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 app.layout = dbc.Container([
     html.Div([
-        dcc.Markdown(children='New title')
+        dcc.Markdown(children='# New title')
     ], className='text-center')
 ], fluid=True, className='bg-light p-4 border-bottom border-3 border-primary')
 

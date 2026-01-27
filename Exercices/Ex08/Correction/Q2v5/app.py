@@ -1,6 +1,10 @@
-"""Dash application factory for Q2v4."""
-import dash_bootstrap_components as dbc
+
+"""
+Dash application factory for Q2v5.
+Centralise la création de l'app Dash et l'assemblage du layout principal.
+"""
 from dash import Dash
+import dash_bootstrap_components as dbc
 from config import THEME, METRIC_OPTIONS, CONTAINER_STYLE
 from components.header import create_header
 from components.tabs import create_tabs, create_tabs_content

@@ -1,4 +1,8 @@
-"""Helper utilities for charts and formatting."""
+
+"""
+Fonctions utilitaires pour les graphiques et le formatage dans Q2v5.
+"""
+
 import pandas as pd
 import plotly.express as px
 import dash_bootstrap_components as dbc
@@ -18,9 +22,10 @@ def fmt_date(ts: pd.Timestamp) -> str:
 
 def make_badges(start_dt, end_dt):
     """Create start/end date badges."""
+    BADGE_SHADOW_STYLE = {"boxShadow": "0 2px 8px rgba(0,0,0,0.15)"}
     return [
-        dbc.Badge(f"Start: {fmt_date(start_dt)}", color=BADGE_COLOR),
-        dbc.Badge(f"End: {fmt_date(end_dt)}", color=BADGE_COLOR),
+        dbc.Badge(f"Start: {fmt_date(start_dt)}", color=BADGE_COLOR, style=BADGE_SHADOW_STYLE),
+        dbc.Badge(f"End: {fmt_date(end_dt)}", color=BADGE_COLOR, style=BADGE_SHADOW_STYLE),
     ]
 
 

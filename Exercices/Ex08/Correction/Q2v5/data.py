@@ -1,4 +1,9 @@
-"""Data loading utilities."""
+
+"""
+Utilitaires de chargement et de préparation des données pour Q2v5.
+Inclut le chargement des jeux de données stocks et gapminder, avec cache.
+"""
+
 import pandas as pd
 import plotly.express as px
 
