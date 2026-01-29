@@ -1,0 +1,1 @@
+df3.groupby(['continent','year'])['pop'].sum()
