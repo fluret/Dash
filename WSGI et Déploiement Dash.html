@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WSGI et Déploiement Dash</title>
+    <style>
+        :root {
+            --font-family-display: Arial, sans-serif;
+            --font-weight-display: 600;
+            --font-family-content: Arial, sans-serif;
+            --font-weight-content: 400;
+            --font-size-content: 16px;
+            --line-height-content: 1.4;
+        }
+
+        body.theme-dark {
+            --color-bg-base: #0f172a;
+            --color-bg-elevated: #020617;
+            --color-bg-surface: #1e293b;
+            --color-bg-muted: #334155;
+            --color-text-primary: #f1f5f9;
+            --color-text-secondary: #cbd5e1;
+            --color-text-muted: #94a3b8;
+            --color-text-accent: #38bdf8;
+            --color-primary: #38bdf8;
+            --color-primary-foreground: #0f172a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-content);
+            font-weight: var(--font-weight-content);
+            font-size: var(--font-size-content);
+            line-height: var(--line-height-content);
+            overflow-x: hidden;
+        }
+
+        .slide {
+            width: 960px;
+            height: 540px;
+            margin: 0 auto 20px;
+            display: flex;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .row { flex-direction: row; }
+        .col { flex-direction: column; }
+        .center {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .items-center { align-items: center; }
+        .items-start { align-items: flex-start; }
+        .fill-width { flex: 1; }
+
+        .gap-lg { gap: 1.5rem; }
+        .gap-xl { gap: 2rem; }
+
+        .p-16 { padding: 4rem; }
+        .p-12 { padding: 3rem; }
+        .p-8 { padding: 2rem; }
+
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mb-8 { margin-bottom: 2rem; }
+
+        .mt-4 { margin-top: 1rem; }
+        .mt-8 { margin-top: 2rem; }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-family-display);
+            font-weight: var(--font-weight-display);
+            line-height: 1.2;
+            margin: 0;
+        }
+
+        h1 { font-size: 3rem; }
+        h2 { font-size: 2.25rem; }
+        h3 { font-size: 1.75rem; }
+        h4 { font-size: 1.5rem; }
+
+        .text-6xl { font-size: 3.75rem; }
+        .text-5xl { font-size: 3rem; }
+        .text-2xl { font-size: 1.5rem; }
+        .text-xl { font-size: 1.25rem; }
+        .text-lg { font-size: 1.125rem; }
+        .text-sm { font-size: 0.875rem; }
+
+        .font-bold { font-weight: 700; }
+        .font-semibold { font-weight: 600; }
+
+        ul, ol {
+            margin-left: 2rem;
+            line-height: 1.8;
+        }
+
+        li { margin-bottom: 0.75rem; }
+
+        code {
+            background-color: #1e293b;
+            color: #38bdf8;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        pre {
+            background-color: #1e293b;
+            color: #cbd5e1;
+            padding: 1rem;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            margin: 1rem 0;
+        }
+
+        .card-rect {
+            background-color: #1e293b;
+            color: #f1f5f9;
+            padding: 1.5rem;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .opacity-80 { opacity: 0.8; }
+        .opacity-70 { opacity: 0.7; }
+    </style>
+</head>
+<body class="theme-dark">
+
+    <!-- Slide 1: Titre -->
+    <section class="slide p-16 col center" style="background-color: #020617; color: #f1f5f9;">
+        <h1 class="text-6xl mb-4" style="color: #38bdf8;">WSGI</h1>
+        <p class="text-2xl" style="color: #cbd5e1;">Web Server Gateway Interface</p>
+        <p class="text-xl mt-8" style="color: #cbd5e1;">La couche qui connecte votre application Dash au serveur</p>
+        <p class="text-sm mt-8" style="color: #94a3b8;">Master 2 • Déploiement d'applications web</p>
+    </section>
+
+    <!-- Slide 2: Le problème -->
+    <section class="slide p-16 col" style="background-color: #0f172a; color: #f1f5f9;">
+        <h2 class="mb-6" style="color: #38bdf8;">Le problème classique</h2>
+        <ul class="text-lg" style="color: #cbd5e1;">
+            <li>Les serveurs web (Nginx, Apache) parlent HTTP</li>
+            <li>Votre code Python ne parle pas HTTP</li>
+            <li>Comment connecter les deux ?</li>
+            <li>Besoin d'une interface <strong>standardisée</strong></li>
+        </ul>
+    </section>
+
+    <!-- Slide 3: Qu'est-ce que WSGI ? -->
+    <section class="slide p-16 col" style="background-color: #0f172a; color: #f1f5f9;">
+        <h2 class="mb-6" style="color: #38bdf8;">Qu'est-ce que WSGI ?</h2>
+        <p class="text-lg mb-6" style="color: #cbd5e1;">
+            <strong>WSGI</strong> = une <strong>spécification</strong> (PEP 3333) qui définit comment un serveur web communique avec une application Python.
+        </p>
+        <ul class="text-lg" style="color: #cbd5e1;">
+            <li><strong>Pas un serveur</strong> : c'est un contrat/interface</li>
+            <li><strong>Pas un framework</strong> : c'est une norme</li>
+            <li>Permet la <strong>portabilité</strong> des applications</li>
+        </ul>
+    </section>
+
+    <!-- Slide 4: Architecture WSGI -->
+    <section class="slide p-16 col" style="background-color: #0f172a; color: #f1f5f9;">
+        <h2 class="mb-8" style="color: #38bdf8;">Architecture WSGI : Les deux côtés</h2>
+        <div class="row gap-xl items-start">
+            <div class="fill-width card-rect">
+                <h3 style="color: #38bdf8;">Côté Serveur</h3>
+                <p style="color: #cbd5e1; margin-top: 0.75rem;">Gunicorn, uWSGI, Waitress...</p>
+                <p style="color: #94a3b8; font-size: 0.9rem; margin-top: 1rem;">Écoute les requêtes HTTP, appelle l'application</p>
+            </div>
+            <div class="fill-width card-rect">
+                <h3 style="color: #38bdf8;">Côté Application</h3>
+                <p style="color: #cbd5e1; margin-top: 0.75rem;">Flask, Django, Dash...</p>
+                <p style="color: #94a3b8; font-size: 0.9rem; margin-top: 1rem;">Un callable Python qui reçoit les requêtes</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 5: La signature WSGI -->
+    <section class="slide p-16 col" style="background-color: #0f172a; color: #f1f5f9;">
+        <h2 class="mb-6" style="color: #38bdf8;">La signature WSGI</h2>
+        <pre><code style="color: #38bdf8;">def application(environ, start_response):
+    # environ : dict avec les infos HTTP
+    # start_response : callback pour envoyer réponse
+    
+    status = '200 OK'
+    headers = [('Content-Type', 'text/plain')]
+    start_response(status, headers)
+    
+    return [b"Hello World"]</code></pre>
+        <p class="text-sm mt-4" style="color: #94a3b8;">Tous les frameworks Python doivent respecter cette signature</p>
+    </section>
+
+    <!-- Slide 6: Qu'est-ce que environ ? -->
+    <section class="slide p-16 col" style="background-color: #0f172a; color: #f1f5f9;">
+        <h2 class="mb-6" style="color: #38bdf8;">Le dictionnaire <code>environ</code></h2>
+        <ul class="text-lg" style="color: #cbd5e1;">
+            <li><code>REQUEST_METHOD</code> : GET, POST, PUT, DELETE...</li>
+            <li><code>PATH_INFO</code> : le chemin de la requête</li>
+            <li><code>QUERY_STRING</code> : les paramètres d'URL</li>
+            <li><code>HTTP_*</code> : tous les headers HTTP</li>
+            <li><code>wsgi.input</code> : le corps de la requête (POST)</li>
+        </ul>
+        <p class="text-sm mt-4" style="color: #94a3b8;">C'est tout ce dont vous avez besoin pour traiter la requête</p>
+    </section>
+
+    <!-- Slide 7: Flux d'une requête -->
+    <section class="slide p-16 col" style="background-color: #0f172a; color: #f1f5f9;">
+        <h2 class="mb-6" style="color: #38bdf8;">Flux d'une requête WSGI</h2>
+        <ol class="text-lg" style="color: #cbd5e1;">
+            <li>Client envoie requête HTTP</li>
+            <li>Serveur WSGI (Gunicorn) reçoit la requête</li>
+            <li>Serveur crée le dict <code>environ</code></li>
+            <li>Serveur appelle <code>application(environ, start_response)</code></li>
+            <li>Application traite et retourne une réponse</li>
+            <li>Serveur transmet la réponse au client</li>
+        </ol>
+    </section>
+
+    <!-- Slide 8: Pourquoi WSGI ? -->
+    <section class="slide p-16 col" style="background-color: #0f172a; color: #f1f5f9;">
+        <h2 class="mb-6" style="color: #38bdf8;">Avantages de WSGI</h2>
+        <ul class="text-lg" style="color: #cbd5e1;">
+            <li><strong>Standardisation</strong> : une seule interface pour tous</li>
+            <li><strong>Flexibilité</strong> : swap serveur/framework indépendamment</li>
+            <li><strong>Portabilité</strong> : votre Dash tourne partout</li>
+            <li><strong>Performance</strong> : possibilité de workers multiples</li>
+        </ul>
+    </section>
+
+    <!-- Slide 9: Dash est WSGI-compliant -->
+    <section class="slide p-16 col" style="background-color: #0f172a; color: #f1f5f9;">
+        <h2 class="mb-6" style="color: #38bdf8;">Dash et WSGI</h2>
+        <p class="text-lg mb-6" style="color: #cbd5e1;">
+            Quand vous créez une app Dash, elle est un objet WSGI-compliant :
+        </p>
+        <pre><code style="color: #38bdf8;">import dash
+
+app = dash.Dash(__name__)
+
+# app.server est une application WSGI Flask
+# (Dash utilise Flask en dessous)</code></pre>
+        <p class="text-sm mt-4" style="color: #94a3b8;">Vous pouvez donc utiliser n'importe quel serveur WSGI !</p>
+    </section>
+
+    <!-- Slide 10: Architecture de déploiement -->
+    <section class="slide p-16 col" style="background-color: #0f172a; color: #f1f5f9;">
+        <h2 class="mb-6" style="color: #38bdf8;">Architecture typique : Nginx + Gunicorn + Dash</h2>
+        <pre style="font-size: 0.8rem; line-height: 1.5;"><code style="color: #38bdf8;">Client HTTP
+    ↓
+Nginx (port 80/443)
+    ↓
+Gunicorn WSGI (port 8000)
+    ↓
+Votre app Dash
+    ↓
+Réponse HTML/JSON</code></pre>
+        <p class="text-sm mt-4" style="color: #94a3b8;">Nginx gère les connexions, Gunicorn gère Python, Dash gère la logique</p>
+    </section>
+
+    <!-- Slide 11: Serveurs WSGI courants -->
+    <section class="slide p-16 col" style="background-color: #0f172a; color: #f1f5f9;">
+        <h2 class="mb-6" style="color: #38bdf8;">Serveurs WSGI courants</h2>
+        <ul class="text-lg" style="color: #cbd5e1;">
+            <li><strong>Gunicorn</strong> : simple, populaire, production ✓</li>
+            <li><strong>uWSGI</strong> : puissant, complexe, flexible</li>
+            <li><strong>Waitress</strong> : pur Python, pas de dépendances C</li>
+            <li><strong>mod_wsgi</strong> : intégré à Apache</li>
+        </ul>
+        <p class="text-sm mt-4" style="color: #94a3b8;">Pour Dash en production : Gunicorn est le meilleur choix</p>
+    </section>
+
+    <!-- Slide 12: Exemple Gunicorn -->
+    <section class="slide p-16 col" style="background-color: #0f172a; color: #f1f5f9;">
+        <h2 class="mb-4" style="color: #38bdf8;">Démarrer une app Dash avec Gunicorn</h2>
+        <pre><code style="color: #38bdf8;">gunicorn --bind 0.0.0.0:8000 app:server</code></pre>
+        <p class="text-lg mt-4 mb-4" style="color: #cbd5e1;">
+            Où <code>app</code> = le fichier Python et <code>server</code> = la variable WSGI
+        </p>
+        <p class="text-sm" style="color: #94a3b8;">
+            <strong>Note :</strong> dans Dash, utilisez <code>app.server</code> (c'est l'objet Flask sous-jacent)
+        </p>
+    </section>
+
+    <!-- Slide 13: Configuration avancée -->
+    <section class="slide p-16 col" style="background-color: #0f172a; color: #f1f5f9;">
+        <h2 class="mb-6" style="color: #38bdf8;">Configuration Gunicorn avancée</h2>
+        <ul class="text-lg" style="color: #cbd5e1;">
+            <li><code>--workers 4</code> : nombre de workers (processus)</li>
+            <li><code>--threads 2</code> : threads par worker</li>
+            <li><code>--worker-class gthread</code> : threading</li>
+            <li><code>--timeout 60</code> : timeout en secondes</li>
+        </ul>
+        <p class="text-sm mt-4" style="color: #94a3b8;">Règle : workers = (2 × CPU cores) + 1</p>
+    </section>
+
+    <!-- Slide 14: Configuration Nginx -->
+    <section class="slide p-16 col" style="background-color: #0f172a; color: #f1f5f9;">
+        <h2 class="mb-4" style="color: #38bdf8;">Configuration Nginx pour Dash</h2>
+        <pre><code style="color: #38bdf8;">server {
+    listen 80;
+    server_name example.com;
+
+    location /app/ {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+    }
+}</code></pre>
+        <p class="text-sm mt-4" style="color: #94a3b8;">L'URL Dash doit correspondre avec <code>url_base_pathname</code></p>
+    </section>
+
+    <!-- Slide 15: Bonnes pratiques -->
+    <section class="slide p-16 col" style="background-color: #0f172a; color: #f1f5f9;">
+        <h2 class="mb-6" style="color: #38bdf8;">Bonnes pratiques de déploiement</h2>
+        <ul class="text-lg" style="color: #cbd5e1;">
+            <li>Toujours utiliser Nginx devant Gunicorn</li>
+            <li>Au minimum 2 workers Gunicorn</li>
+            <li>Monitorer la consommation mémoire/CPU</li>
+            <li>Logs séparés : Nginx et Gunicorn</li>
+            <li>Utiliser systemd pour gérer Gunicorn</li>
+        </ul>
+    </section>
+
+    <!-- Slide 16: Synthèse -->
+    <section class="slide p-16 col center" style="background-color: #020617; color: #f1f5f9;">
+        <h2 class="text-4xl mb-6" style="color: #38bdf8;">Synthèse</h2>
+        <p class="text-xl mb-4" style="color: #cbd5e1;">WSGI = le bridge standardisé entre vos apps Python et le web</p>
+        <p class="text-lg" style="color: #cbd5e1;">Dash ✓ Gunicorn ✓ Nginx = production ready</p>
+    </section>
+
+</body>
+</html>
